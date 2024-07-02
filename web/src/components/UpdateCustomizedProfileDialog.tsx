@@ -17,7 +17,7 @@ const UpdateCustomizedProfileDialog: React.FC<Props> = ({ destroy }: Props) => {
   const t = useTranslate();
   const workspaceSettingStore = useWorkspaceSettingStore();
   const workspaceGeneralSetting = WorkspaceGeneralSetting.fromPartial(
-    workspaceSettingStore.getWorkspaceSettingByKey(WorkspaceSettingKey.WORKSPACE_SETTING_GENERAL)?.generalSetting || {},
+    workspaceSettingStore.getWorkspaceSettingByKey(WorkspaceSettingKey.GENERAL)?.generalSetting || {},
   );
   const [customProfile, setCustomProfile] = useState<WorkspaceCustomProfile>(
     WorkspaceCustomProfile.fromPartial(workspaceGeneralSetting.customProfile || {}),
@@ -78,13 +78,13 @@ const UpdateCustomizedProfileDialog: React.FC<Props> = ({ destroy }: Props) => {
 
   const handleSaveButtonClick = async () => {
     if (customProfile.title === "") {
-      toast.error(t("message.fill-server-name"));
+      toast.error("Title cannot be empty.");
       return;
     }
 
     try {
       await workspaceSettingStore.setWorkspaceSetting({
-        name: `${WorkspaceSettingPrefix}${WorkspaceSettingKey.WORKSPACE_SETTING_GENERAL}`,
+        name: `${WorkspaceSettingPrefix}${WorkspaceSettingKey.GENERAL}`,
         generalSetting: {
           ...workspaceGeneralSetting,
           customProfile: customProfile,
@@ -94,7 +94,7 @@ const UpdateCustomizedProfileDialog: React.FC<Props> = ({ destroy }: Props) => {
       console.error(error);
       return;
     }
-    toast.success(t("message.succeed-update-customized-profile"));
+    toast.success(t("message.update-succeed"));
     destroy();
   };
 

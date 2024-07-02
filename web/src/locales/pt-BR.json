@@ -1,15 +1,4 @@
 {
-  "about": {
-    "about-memos": "Sobre o memos",
-    "memos-description": "memos é um aplicativo de bloco de notas baseado na web que você pode usar para escrever, organizar e compartilhar anotações.",
-    "no-server-description": "Nenhuma descrição configurada para este servidor.",
-    "other-projects": "Outros projetos"
-  },
-  "amount-text": {
-    "memo_many": "MEMOS",
-    "memo_one": "MEMO",
-    "memo_other": ""
-  },
   "auth": {
     "create-your-account": "Crie sua conta",
     "host-tip": "Você está se registrando como Host do Site.",
@@ -22,7 +11,7 @@
     "about": "Sobre",
     "admin": "Admin",
     "archive": "Arquivar",
-    "archived": "Arquivado",
+    "archived": "Arquivo",
     "avatar": "Avatar",
     "basic": "Básico",
     "beta": "Beta",
@@ -43,7 +32,7 @@
     "filter": "Filtro",
     "home": "Início",
     "image": "Imagem",
-    "inbox": "Caixa de Entrada",
+    "inbox": "Notificações",
     "language": "Idioma",
     "learn-more": "Saiba mais",
     "link": "Link",
@@ -68,7 +57,7 @@
     "save": "Salvar",
     "search": "Pesquisar",
     "select": "Selecionar",
-    "settings": "Configurações",
+    "settings": "Ajustes",
     "share": "Compartilhar",
     "sign-in": "Entrar",
     "sign-in-with": "Entrar com {{provider}}",
@@ -100,22 +89,16 @@
     "any-thoughts": "Alguma ideia…",
     "save": "Salvar"
   },
-  "embed-memo": {
-    "copy": "Copiar",
-    "only-public-supported": "* Somente memos públicos podem ser embutidos.",
-    "text": "Copie o código abaixo para incorporar este memo em seu site.",
-    "title": "Embutir memo"
-  },
   "inbox": {
-    "memo-comment": "{{user}} tem um comentário sobre o seu {{memo}}.",
+    "memo-comment": "{{user}} tem um comentário sobre {{memo}}.",
     "version-update": "A nova versão {{version}} já está disponível!"
   },
   "memo": {
     "archived-at": "Arquivado em",
-    "archived-memos": "Memos arquivados",
+    "code": "Código",
     "comment": {
-      "no-comment": "Nenhum comentário",
-      "self": "Comentários"
+      "self": "Comentários",
+      "write-a-comment": "Escreva um comentário"
     },
     "copy-link": "Copiar link",
     "count-memos-in-date": "{{count}} memos em {{date}}",
@@ -124,57 +107,33 @@
     "embed": "Embutir",
     "fetch-more": "Clique para carregar mais",
     "fetching-data": "Obtendo dados…",
+    "links": "Links",
     "no-archived-memos": "Nenhum memo arquivado.",
     "search-placeholder": "Pesquisar memos",
     "show-more": "Mostrar mais",
+    "to-do": "Tarefas",
     "view-detail": "Ver detalhes",
     "visibility": {
       "disabled": "Memos públicos estão desabilitados",
       "private": "Privado (eu)",
       "protected": "Protegido (membros)",
       "public": "Público (todos)"
-    },
-    "wrapping": "Quebra"
+    }
   },
   "message": {
     "archived-successfully": "Arquivado com êxito",
     "change-memo-created-time": "Alterar data de criação do memo",
-    "change-resource-filename": "Alterar nome do arquivo do recurso",
-    "click-to-save-the-image": "Clique para salvar a imagem",
     "copied": "Copiado",
-    "count-selected-resources": "Total selecionado",
     "deleted-successfully": "Êxito na exclusão",
-    "failed-to-embed-memo": "Falha ao embutir o memo",
     "fill-all": "Por favor, preencha todos os campos.",
-    "fill-form": "Por favor, preencha o formulário",
-    "fill-server-name": "Por favor, preencha o nome do servidor",
-    "generating-the-screenshot": "Gerando a captura de tela…",
-    "image-load-failed": "Falha ao carregar a imagem",
-    "invalid-created-datetime": "Data de criação inválida.",
-    "invalid-resource-filename": "Nome de arquivo de recurso inválido.",
-    "login-failed": "Falha no login",
     "maximum-upload-size-is": "O tamanho máximo permitido para upload é {{size}} MiB",
     "memo-not-found": "Memo não encontrado.",
-    "memo-updated-datetime": "Data de criação do memo atualizada.",
-    "memos-ready": "todos os memos estão prontos 🎉",
     "new-password-not-match": "As novas senhas não coincidem.",
     "no-data": "Nenhum dado encontrado.",
     "password-changed": "Senha alterada",
     "password-not-match": "As senhas não coincidem.",
-    "private-only": "Este memo é privado.",
-    "resource-filename-updated": "Nome do arquivo do recurso atualizado.",
-    "resource-ready": "todos os recursos estão prontos 🎉",
     "restored-successfully": "Restaurado com êxito",
-    "signup-failed": "Falha no registro",
-    "succeed-copy-code": "Código copiado com êxito.",
-    "succeed-copy-content": "Conteúdo copiado com êxito.",
     "succeed-copy-link": "Link copiado com êxito.",
-    "succeed-copy-link-not-public": "Conteúdo copiado com êxito. Este memo não pode ser acessado sem fazer login.",
-    "succeed-copy-resource-link": "Link do recurso copiado com êxito.",
-    "succeed-update-additional-script": "Script adicional atualizado com êxito.",
-    "succeed-update-additional-style": "Folha de estilos adicional atualizada com êxito.",
-    "succeed-update-customized-profile": "Perfil personalizado com êxito.",
-    "succeed-vacuum-database": "Banco de dados compactado com êxito.",
     "update-succeed": "Atualizado com êxito",
     "user-not-found": "Usuário não encontrado"
   },
@@ -182,7 +141,7 @@
     "add-references": "Adicionar referências",
     "embedded-usage": "Usar como Conteúdo Embutido",
     "no-memos-found": "Nenhum memo encontrado",
-    "search-bar-placeholder": "Pesquisar conteúdo"
+    "search-placeholder": "Pesquisar conteúdo"
   },
   "resource": {
     "clear": "Limpar",
@@ -214,11 +173,7 @@
     "no-unused-resources": "Nenhum recurso não utilizado",
     "reset-link": "Redefinir link",
     "reset-link-prompt": "Tem certeza de que deseja redefinir o link?\nIsso quebrará todos os vínculos atuais.\n\nESTA AÇÃO É IRREVERSÍVEL",
-    "reset-resource-link": "Redefinir link do recurso",
-    "search-bar-placeholder": "Pesquisar recurso",
-    "upload-successfully": "Carregado com êxito",
-    "warning-text": "Tem certeza de que deseja deletar este recurso?\n\nESTA AÇÃO É IRREVERSÍVEL",
-    "warning-text-unused": "Tem certeza de que deseja deletar este recurso não utilizado?\n\nESTA AÇÃO É IRREVERSÍVEL"
+    "reset-resource-link": "Redefinir link do recurso"
   },
   "router": {
     "back-to-top": "Voltar ao Topo",
@@ -252,6 +207,7 @@
       "delete-member": "Deletar membro",
       "delete-warning": "Tem certeza de que deseja deletar {{username}}?\n\nESTA AÇÃO É IRREVERSÍVEL"
     },
+    "memo-related": "Memo",
     "my-account": "Minha conta",
     "preference": "Preferências",
     "preference-section": {
@@ -330,36 +286,29 @@
         "locale": "Localização do servidor",
         "title": "Personalizar Servidor"
       },
-      "database-file-size": "Tamanho do banco de dados",
       "disable-password-login": "Desabilitar login com senha",
       "disable-password-login-final-warning": "Por favor, digite \"CONFIRM\" para prosseguir.",
       "disable-password-login-warning": "Isso desabilitará o login com senha para todos os usuários. Caso seus provedores de identidade (SSO) configurados falhem, não será possível fazer login sem reverter esse ajuste manualmente no banco de dados. Você também deverá tomar precauções adicionais ao remover qualquer provedor de identidade ❗",
       "disable-public-memos": "Desabilitar memos públicos",
       "display-with-updated-time": "Exibir hora de atualização nos memos",
+      "enable-auto-compact": "Ativar exibição compacta automaticamente",
+      "enable-double-click-to-edit": "Ativar clique duplo para editar",
       "enable-password-login": "Habilitar login com senha",
       "enable-password-login-warning": "Isso permitirá o login com senha para todos os usuários. Continue apenas se desejar que os usuários possam fazer login usando SSO e senha local❗",
       "max-upload-size": "Tamanho máximo de upload (MiB)",
       "max-upload-size-hint": "O valor recomendado é 32 MiB.",
-      "server-name": "Nome do servidor",
-      "vacuum-hint": "Limpa dados não utilizados."
+      "server-name": "Nome do servidor"
     }
   },
   "tag": {
     "all-tags": "Todas as Tags",
     "create-tag": "Criar Tag",
     "create-tags-guide": "Você pode criar tags inserindo `#tag`.",
-    "delete-confirm": "Tem certeza de que deseja excluir esta tag?",
+    "delete-confirm": "Tem certeza de que deseja excluir esta tag?\\nTodos os memos relacionados serão arquivados.",
     "delete-tag": "Excluir Tag",
-    "hide": "Ocultar",
-    "invalid-tag-name": "Nome de tag inválido",
-    "no-tag-found": "Nenhuma tag encontrada",
-    "save-all": "Salvar tudo",
-    "show": "Mostrar",
-    "tag-name": "NOME_DA_TAG",
-    "tag-suggestions": "Sugestões de Tag",
-    "tip-text": "Insira `#tag` para criar uma nova"
+    "no-tag-found": "Nenhuma tag encontrada"
   },
   "timeline": {
-    "title": "Linha do tempo"
+    "title": "Histórico"
   }
 }

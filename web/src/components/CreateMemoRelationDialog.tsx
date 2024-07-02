@@ -23,7 +23,7 @@ const CreateMemoRelationDialog: React.FC<Props> = (props: Props) => {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [fetchedMemos, setFetchedMemos] = useState<Memo[]>([]);
   const [selectedMemos, setSelectedMemos] = useState<Memo[]>([]);
-  const [embedded, setEmbedded] = useState<boolean>(false);
+  const [embedded, setEmbedded] = useState<boolean>(true);
   const filteredMemos = fetchedMemos.filter((memo) => !selectedMemos.includes(memo));
 
   useDebounce(
@@ -96,7 +96,7 @@ const CreateMemoRelationDialog: React.FC<Props> = (props: Props) => {
           size="md"
           clearOnBlur
           disableClearable
-          placeholder={t("reference.search-bar-placeholder")}
+          placeholder={t("reference.search-placeholder")}
           noOptionsText={t("reference.no-memos-found")}
           options={filteredMemos}
           loading={isFetching}

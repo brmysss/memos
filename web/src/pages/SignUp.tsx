@@ -1,6 +1,6 @@
 import { Button, Input } from "@mui/joy";
 import { ClientError } from "nice-grpc-web";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import AppearanceSelect from "@/components/AppearanceSelect";
@@ -24,8 +24,13 @@ const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const workspaceGeneralSetting =
-    workspaceSettingStore.getWorkspaceSettingByKey(WorkspaceSettingKey.WORKSPACE_SETTING_GENERAL).generalSetting ||
-    WorkspaceGeneralSetting.fromPartial({});
+    workspaceSettingStore.getWorkspaceSettingByKey(WorkspaceSettingKey.GENERAL).generalSetting || WorkspaceGeneralSetting.fromPartial({});
+
+  useEffect(() => {
+    if (!commonContext.profile.public) {
+      toast.error("Sign up is not allowed.");
+    }
+  }, []);
 
   const handleUsernameInputChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value as string;
@@ -66,7 +71,7 @@ const SignUp = () => {
       navigateTo("/");
     } catch (error: any) {
       console.error(error);
-      toast.error((error as ClientError).details || t("message.signup-failed"));
+      toast.error((error as ClientError).details || "Sign up failed");
     }
     actionBtnLoadingState.setFinish();
   };
@@ -83,7 +88,7 @@ const SignUp = () => {
         <p className="w-full text-2xl mt-2 dark:text-gray-500">{t("auth.create-your-account")}</p>
         <form className="w-full mt-2" onSubmit={handleFormSubmit}>
           <div className="flex flex-col justify-start items-start w-full gap-4">
-            <div className="w-full flex flex-col justify-start items-start gap-2">
+            <div className="w-full flex flex-col justify-start items-start">
               <span className="leading-8 text-gray-600">{t("common.username")}</span>
               <Input
                 className="w-full"
@@ -96,7 +101,7 @@ const SignUp = () => {
                 required
               />
             </div>
-            <div className="w-full flex flex-col justify-start items-start gap-2">
+            <div className="w-full flex flex-col justify-start items-start">
               <span className="leading-8 text-gray-600">{t("common.password")}</span>
               <Input
                 className="w-full"
@@ -123,13 +128,16 @@ const SignUp = () => {
             </Button>
           </div>
         </form>
-        {!commonContext.profile.owner && <p className="w-full mt-4 text-sm font-medium dark:text-gray-500">{t("auth.host-tip")}</p>}
-        <p className="w-full mt-4 text-sm">
-          <span className="dark:text-gray-500">{t("auth.sign-in-tip")}</span>
-          <Link to="/auth" className="cursor-pointer ml-2 text-blue-600 hover:underline" unstable_viewTransition>
-            {t("common.sign-in")}
-          </Link>
-        </p>
+        {!commonContext.profile.owner ? (
+          <p className="w-full mt-4 text-sm font-medium dark:text-gray-500">{t("auth.host-tip")}</p>
+        ) : (
+          <p className="w-full mt-4 text-sm">
+            <span className="dark:text-gray-500">{t("auth.sign-in-tip")}</span>
+            <Link to="/auth" className="cursor-pointer ml-2 text-blue-600 hover:underline" unstable_viewTransition>
+              {t("common.sign-in")}
+            </Link>
+          </p>
+        )}
       </div>
       <div className="mt-4 flex flex-row items-center justify-center w-full gap-2">
         <LocaleSelect value={commonContext.locale} onChange={handleLocaleSelectChange} />

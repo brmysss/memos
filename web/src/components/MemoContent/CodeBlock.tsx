@@ -1,11 +1,9 @@
-import { Checkbox } from "@mui/joy";
 import clsx from "clsx";
 import copy from "copy-to-clipboard";
+import DOMPurify from "dompurify";
 import hljs from "highlight.js";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
-import useResponsiveWidth from "@/hooks/useResponsiveWidth";
-import { useTranslate } from "@/utils/i18n";
 import Icon from "../Icon";
 import MermaidBlock from "./MermaidBlock";
 import { BaseProps } from "./types";
@@ -26,16 +24,11 @@ const CodeBlock: React.FC<Props> = ({ language, content }: Props) => {
 
   // Users can set Markdown code blocks as `__html` to render HTML directly.
   if (formatedLanguage === SpecialLanguage.HTML) {
-    return <div className="w-full overflow-auto !my-2" dangerouslySetInnerHTML={{ __html: content }} />;
+    const purify = DOMPurify(window);
+    return <div className="w-full overflow-auto !my-2" dangerouslySetInnerHTML={{ __html: purify.sanitize(content) }} />;
   } else if (formatedLanguage === SpecialLanguage.MERMAID) {
     return <MermaidBlock content={content} />;
   }
-
-  const { md } = useResponsiveWidth();
-  const t = useTranslate();
-
-  const [wrap, setWrap] = useState(true);
-  const handleWrapChange = useCallback(() => setWrap(!wrap), [setWrap, wrap]);
 
   const highlightedCode: string = useMemo(() => {
     try {
@@ -61,25 +54,17 @@ const CodeBlock: React.FC<Props> = ({ language, content }: Props) => {
     <div className="w-full my-1 bg-amber-100 border-l-4 border-amber-400 rounded hover:shadow dark:bg-zinc-600 dark:border-zinc-400 relative">
       <div className="w-full px-2 py-1 flex flex-row justify-between items-center text-amber-500 dark:text-zinc-400">
         <span className="text-sm font-mono">{formatedLanguage}</span>
-        {md && <Icon.Copy className="w-4 h-auto cursor-pointer hover:opacity-80" onClick={handleCopyButtonClick} />}
+        <Icon.Copy className="w-4 h-auto cursor-pointer hover:opacity-80" onClick={handleCopyButtonClick} />
       </div>
 
       <div className="overflow-auto">
-        <pre className={clsx(wrap ? "whitespace-pre-wrap" : "no-wrap overflow-auto", "w-full p-2 bg-amber-50 dark:bg-zinc-700 relative")}>
+        <pre className={clsx("no-wrap overflow-auto", "w-full p-2 bg-amber-50 dark:bg-zinc-700 relative")}>
           <code
             className={clsx(`language-${formatedLanguage}`, "block text-sm leading-5")}
             dangerouslySetInnerHTML={{ __html: highlightedCode }}
           ></code>
         </pre>
       </div>
-      {!md && (
-        <div className="sticky flex px-2 h-8 bottom-0 bg-amber-100 dark:bg-zinc-600 rounded items-center">
-          <div className="grow h-full">
-            <Checkbox className="h-full items-center" label={t("memo.wrapping")} size="sm" checked={wrap} onChange={handleWrapChange} />
-          </div>
-          <Icon.Copy className="w-4 h-full cursor-pointer hover:opacity-80" onClick={handleCopyButtonClick} />
-        </div>
-      )}
     </div>
   );
 };

@@ -30,10 +30,8 @@ type Profile struct {
 	Driver string `json:"-"`
 	// Version is the current version of server
 	Version string `json:"version"`
-	// Frontend indicate the frontend is enabled or not
-	Frontend bool `json:"-"`
-	// Origins is the list of allowed origins
-	Origins []string `json:"-"`
+	// Pubic is the flag whether the instance is public for others.
+	Public bool `json:"public"`
 }
 
 func (p *Profile) IsDev() bool {

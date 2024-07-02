@@ -1,53 +1,44 @@
+import { Location } from "react-router-dom";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
-import { tagServiceClient } from "@/grpcweb";
+import { memoServiceClient } from "@/grpcweb";
+import { Routes } from "@/router";
+import { User } from "@/types/proto/api/v1/user_service";
 
 interface State {
-  tags: Set<string>;
+  tagAmounts: Record<string, number>;
 }
 
 const getDefaultState = (): State => ({
-  tags: new Set(),
+  tagAmounts: {},
 });
 
 export const useTagStore = create(
   combine(getDefaultState(), (set, get) => ({
     setState: (state: State) => set(state),
     getState: () => get(),
-    fetchTags: async (options?: { skipCache: boolean }) => {
-      const { tags: tagsCache } = get();
-      if (tagsCache.size && !options?.skipCache) {
-        return tagsCache;
+    sortedTags: () => {
+      return Object.entries(get().tagAmounts)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .sort((a, b) => b[1] - a[1])
+        .map(([tag]) => tag);
+    },
+    fetchTags: async (params: { user?: User; location?: Location<any> }, options?: { skipCache?: boolean }) => {
+      const { tagAmounts: cache } = get();
+      if (cache.length > 0 && !options?.skipCache) {
+        return cache;
       }
-      const { tags } = await tagServiceClient.listTags({});
-      set({ tags: new Set(tags.map((tag) => tag.name)) });
-      return tags;
-    },
-    upsertTag: async (tagName: string) => {
-      await tagServiceClient.upsertTag({
-        name: tagName,
-      });
-      const { tags } = get();
-      set({ tags: new Set([...tags, tagName]) });
-    },
-    batchUpsertTag: async (tagNames: string[]) => {
-      await tagServiceClient.batchUpsertTag({
-        requests: tagNames.map((name) => ({
-          name,
-        })),
-      });
-      const { tags } = get();
-      set({ tags: new Set([...tags, ...tagNames]) });
-    },
-    deleteTag: async (tagName: string) => {
-      await tagServiceClient.deleteTag({
-        tag: {
-          name: tagName,
-        },
-      });
-      const { tags } = get();
-      tags.delete(tagName);
-      set({ tags });
+      const filters = [`row_status == "NORMAL"`];
+      if (params.user) {
+        if (params.location?.pathname === Routes.EXPLORE) {
+          filters.push(`visibilities == ["PUBLIC", "PROTECTED"]`);
+        }
+        filters.push(`creator == "${params.user.name}"`);
+      } else {
+        filters.push(`visibilities == ["PUBLIC"]`);
+      }
+      const { tagAmounts } = await memoServiceClient.listMemoTags({ parent: "memos/-", filter: filters.join(" && ") });
+      set({ tagAmounts });
     },
   })),
 );

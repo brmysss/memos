@@ -11,7 +11,6 @@ tags:
   - name: MarkdownService
   - name: ResourceService
   - name: MemoService
-  - name: TagService
   - name: WebhookService
   - name: WorkspaceService
   - name: WorkspaceSettingService
@@ -311,7 +310,7 @@ paths:
         - name: filter
           description: |-
             Filter is used to filter memos returned in the list.
-            Format: "creator == users/{uid} && visibilities == ['PUBLIC', 'PROTECTED']"
+            Format: "creator == 'users/{uid}' && visibilities == ['PUBLIC', 'PROTECTED']"
           in: query
           required: false
           type: string
@@ -411,7 +410,7 @@ paths:
         - name: filter
           description: |-
             Filter is used to filter memos returned.
-            Format: "creator == users/{uid} && visibilities == ['PUBLIC', 'PROTECTED']"
+            Format: "creator == 'users/{uid}' && visibilities == ['PUBLIC', 'PROTECTED']"
           in: query
           required: false
           type: string
@@ -494,137 +493,6 @@ paths:
           type: string
       tags:
         - ResourceService
-  /api/v1/tags:
-    get:
-      summary: ListTags lists tags.
-      operationId: TagService_ListTags
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1ListTagsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - TagService
-    delete:
-      summary: DeleteTag deletes a tag.
-      operationId: TagService_DeleteTag
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            type: object
-            properties: {}
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: tag.name
-          in: query
-          required: false
-          type: string
-        - name: tag.creator
-          description: |-
-            The creator of tags.
-            Format: users/{id}
-          in: query
-          required: false
-          type: string
-      tags:
-        - TagService
-    post:
-      summary: UpsertTag upserts a tag.
-      operationId: TagService_UpsertTag
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1Tag'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1UpsertTagRequest'
-      tags:
-        - TagService
-  /api/v1/tags/suggestion:
-    get:
-      summary: GetTagSuggestions gets tag suggestions from the user's memos.
-      operationId: TagService_GetTagSuggestions
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1GetTagSuggestionsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: user
-          description: |-
-            The creator of tags.
-            Format: users/{id}
-          in: query
-          required: false
-          type: string
-      tags:
-        - TagService
-  /api/v1/tags:batchUpsert:
-    post:
-      summary: BatchUpsertTag upserts multiple tags.
-      operationId: TagService_BatchUpsertTag
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            type: object
-            properties: {}
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1BatchUpsertTagRequest'
-      tags:
-        - TagService
-  /api/v1/tags:rename:
-    patch:
-      summary: |-
-        RenameTag renames a tag.
-        All related memos will be updated.
-      operationId: TagService_RenameTag
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            type: object
-            properties: {}
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1RenameTagRequest'
-      tags:
-        - TagService
   /api/v1/users:
     get:
       summary: ListUsers returns a list of users.
@@ -677,7 +545,7 @@ paths:
         - name: filter
           description: |-
             Filter is used to filter users returned in the list.
-            Format: "username == frank"
+            Format: "username == 'frank'"
           in: query
           required: false
           type: string
@@ -794,10 +662,10 @@ paths:
               creatorId:
                 type: integer
                 format: int32
-              createdTime:
+              createTime:
                 type: string
                 format: date-time
-              updatedTime:
+              updateTime:
                 type: string
                 format: date-time
               rowStatus:
@@ -823,21 +691,6 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - WorkspaceService
-  /api/v1/workspace/settings:
-    get:
-      summary: ListWorkspaceSetting returns the list of settings.
-      operationId: WorkspaceSettingService_ListWorkspaceSettings
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1ListWorkspaceSettingsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      tags:
-        - WorkspaceSettingService
   /api/v1/workspace/{name}:
     get:
       summary: GetWorkspaceSetting returns the setting by name.
@@ -1044,6 +897,10 @@ paths:
                 readOnly: true
               visibility:
                 $ref: '#/definitions/v1Visibility'
+              tags:
+                type: array
+                items:
+                  type: string
               pinned:
                 type: boolean
               parentId:
@@ -1067,6 +924,15 @@ paths:
                 items:
                   type: object
                   $ref: '#/definitions/v1Reaction'
+                readOnly: true
+              property:
+                $ref: '#/definitions/v1MemoProperty'
+                readOnly: true
+              parent:
+                type: string
+                title: |-
+                  The name of the parent memo.
+                  Format: memos/{id}
                 readOnly: true
       tags:
         - MemoService
@@ -1423,6 +1289,60 @@ paths:
             $ref: '#/definitions/v1CreateMemoRequest'
       tags:
         - MemoService
+  /api/v1/{name}/properties:
+    get:
+      summary: ListMemoProperties lists memo properties.
+      operationId: MemoService_ListMemoProperties
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1ListMemoPropertiesResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: name
+          description: |-
+            The name of the memo.
+            Format: memos/{id}. Use "memos/-" to list all properties.
+          in: path
+          required: true
+          type: string
+          pattern: memos/[^/]+
+      tags:
+        - MemoService
+  /api/v1/{name}/properties:rebuild:
+    post:
+      summary: RebuildMemoProperty rebuilds a memo property.
+      operationId: MemoService_RebuildMemoProperty
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            type: object
+            properties: {}
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: name
+          description: |-
+            The name of the memo.
+            Format: memos/{id}. Use "memos/-" to rebuild all memos.
+          in: path
+          required: true
+          type: string
+          pattern: memos/[^/]+
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/MemoServiceRebuildMemoPropertyBody'
+      tags:
+        - MemoService
   /api/v1/{name}/reactions:
     get:
       summary: ListMemoReactions lists reactions for a memo.
@@ -1605,6 +1525,100 @@ paths:
           pattern: users/[^/]+
       tags:
         - UserService
+  /api/v1/{parent}/tags:
+    get:
+      summary: ListMemoTags lists tags for a memo.
+      operationId: MemoService_ListMemoTags
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1ListMemoTagsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: parent
+          description: |-
+            The parent, who owns the tags.
+            Format: memos/{id}. Use "memos/-" to list all tags.
+          in: path
+          required: true
+          type: string
+          pattern: memos/[^/]+
+        - name: filter
+          description: |-
+            Filter is used to filter memos.
+            Format: "creator == 'users/{uid}' && visibilities == ['PUBLIC', 'PROTECTED']"
+          in: query
+          required: false
+          type: string
+      tags:
+        - MemoService
+  /api/v1/{parent}/tags/{tag}:
+    delete:
+      summary: DeleteMemoTag deletes a tag for a memo.
+      operationId: MemoService_DeleteMemoTag
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            type: object
+            properties: {}
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: parent
+          description: |-
+            The parent, who owns the tags.
+            Format: memos/{id}. Use "memos/-" to delete all tags.
+          in: path
+          required: true
+          type: string
+          pattern: memos/[^/]+
+        - name: tag
+          in: path
+          required: true
+          type: string
+        - name: deleteRelatedMemos
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - MemoService
+  /api/v1/{parent}/tags:rename:
+    patch:
+      summary: RenameMemoTag renames a tag for a memo.
+      operationId: MemoService_RenameMemoTag
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            type: object
+            properties: {}
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: parent
+          description: |-
+            The parent, who owns the tags.
+            Format: memos/{id}. Use "memos/-" to rename all tags.
+          in: path
+          required: true
+          type: string
+          pattern: memos/[^/]+
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/MemoServiceRenameMemoTagBody'
+      tags:
+        - MemoService
   /api/v1/{resource.name}:
     patch:
       summary: UpdateResource updates a resource.
@@ -1755,7 +1769,81 @@ paths:
                 format: date-time
       tags:
         - UserService
+  /file/{name}/avatar:
+    get:
+      summary: GetUserAvatarBinary gets the avatar of a user.
+      operationId: UserService_GetUserAvatarBinary
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/apiHttpBody'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: name
+          description: |-
+            The name of the user.
+            Format: users/{id}
+          in: path
+          required: true
+          type: string
+          pattern: users/[^/]+
+        - name: httpBody.contentType
+          description: The HTTP Content-Type header value specifying the content type of the body.
+          in: query
+          required: false
+          type: string
+        - name: httpBody.data
+          description: The HTTP request/response body as raw binary.
+          in: query
+          required: false
+          type: string
+          format: byte
+      tags:
+        - UserService
+  /file/{name}/{filename}:
+    get:
+      summary: GetResourceBinary returns a resource binary by name.
+      operationId: ResourceService_GetResourceBinary
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/apiHttpBody'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: name
+          description: |-
+            The name of the resource.
+            Format: resources/{id}
+            id is the system generated unique identifier.
+          in: path
+          required: true
+          type: string
+          pattern: resources/[^/]+
+        - name: filename
+          description: The filename of the resource. Mainly used for downloading.
+          in: path
+          required: true
+          type: string
+      tags:
+        - ResourceService
 definitions:
+  MemoServiceRebuildMemoPropertyBody:
+    type: object
+  MemoServiceRenameMemoTagBody:
+    type: object
+    properties:
+      oldTag:
+        type: string
+      newTag:
+        type: string
   MemoServiceSetMemoRelationsBody:
     type: object
     properties:
@@ -1800,6 +1888,82 @@ definitions:
       expiresAt:
         type: string
         format: date-time
+  WorkspaceStorageSettingS3Config:
+    type: object
+    properties:
+      accessKeyId:
+        type: string
+      accessKeySecret:
+        type: string
+      endpoint:
+        type: string
+      region:
+        type: string
+      bucket:
+        type: string
+    title: 'Reference: https://developers.cloudflare.com/r2/examples/aws/aws-sdk-go/'
+  apiHttpBody:
+    type: object
+    properties:
+      contentType:
+        type: string
+        description: The HTTP Content-Type header value specifying the content type of the body.
+      data:
+        type: string
+        format: byte
+        description: The HTTP request/response body as raw binary.
+      extensions:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/protobufAny'
+        description: |-
+          Application specific response metadata. Must be set in the first response
+          for streaming APIs.
+    description: |-
+      Message that represents an arbitrary HTTP body. It should only be used for
+      payload formats that can't be represented as JSON, such as raw binary or
+      an HTML page.
+
+
+      This message can be used both in streaming and non-streaming API methods in
+      the request as well as the response.
+
+      It can be used as a top-level request field, which is convenient if one
+      wants to extract parameters from either the URL or HTTP template into the
+      request fields and also want access to the raw HTTP body.
+
+      Example:
+
+          message GetResourceRequest {
+            // A unique request id.
+            string request_id = 1;
+
+            // The raw HTTP body is bound to this field.
+            google.api.HttpBody http_body = 2;
+
+          }
+
+          service ResourceService {
+            rpc GetResource(GetResourceRequest)
+              returns (google.api.HttpBody);
+            rpc UpdateResource(google.api.HttpBody)
+              returns (google.protobuf.Empty);
+
+          }
+
+      Example with streaming methods:
+
+          service CaldavService {
+            rpc GetCalendar(stream google.api.HttpBody)
+              returns (stream google.api.HttpBody);
+            rpc UpdateCalendar(stream google.api.HttpBody)
+              returns (stream google.api.HttpBody);
+
+          }
+
+      Use of this type only changes how the request and response bodies are
+      handled, all other features will continue to work unchanged.
   apiv1ActivityMemoCommentPayload:
     type: object
     properties:
@@ -1913,15 +2077,6 @@ definitions:
   apiv1WorkspaceGeneralSetting:
     type: object
     properties:
-      instanceUrl:
-        type: string
-        description: instance_url is the instance URL.
-      disallowSignup:
-        type: boolean
-        description: disallow_signup is the flag to disallow signup.
-      disallowPasswordLogin:
-        type: boolean
-        description: disallow_password_login is the flag to disallow password login.
       additionalScript:
         type: string
         description: additional_script is the additional script.
@@ -1940,6 +2095,16 @@ definitions:
       displayWithUpdateTime:
         type: boolean
         description: display_with_update_time orders and displays memo with update time.
+      contentLengthLimit:
+        type: integer
+        format: int32
+        description: content_length_limit is the limit of content length. Unit is byte.
+      enableAutoCompact:
+        type: boolean
+        description: enable_auto_compact enables auto compact for large content.
+      enableDoubleClickEdit:
+        type: boolean
+        description: enable_double_click_edit enables editing on double click.
   apiv1WorkspaceSetting:
     type: object
     properties:
@@ -1970,34 +2135,20 @@ definitions:
         format: int64
         description: The max upload size in megabytes.
       s3Config:
-        $ref: '#/definitions/apiv1WorkspaceStorageSettingS3Config'
+        $ref: '#/definitions/WorkspaceStorageSettingS3Config'
         description: The S3 config.
-  apiv1WorkspaceStorageSettingS3Config:
-    type: object
-    properties:
-      accessKeyId:
-        type: string
-      accessKeySecret:
-        type: string
-      endpoint:
-        type: string
-      region:
-        type: string
-      bucket:
-        type: string
-    title: 'Reference: https://developers.cloudflare.com/r2/examples/aws/aws-sdk-go/'
   apiv1WorkspaceStorageSettingStorageType:
     type: string
     enum:
       - STORAGE_TYPE_UNSPECIFIED
-      - STORAGE_TYPE_DATABASE
-      - STORAGE_TYPE_LOCAL
-      - STORAGE_TYPE_S3
+      - DATABASE
+      - LOCAL
+      - S3
     default: STORAGE_TYPE_UNSPECIFIED
     description: |2-
-       - STORAGE_TYPE_DATABASE: STORAGE_TYPE_DATABASE is the database storage type.
-       - STORAGE_TYPE_LOCAL: STORAGE_TYPE_LOCAL is the local storage type.
-       - STORAGE_TYPE_S3: STORAGE_TYPE_S3 is the S3 storage type.
+       - DATABASE: DATABASE is the database storage type.
+       - LOCAL: LOCAL is the local storage type.
+       - S3: S3 is the S3 storage type.
   googlerpcStatus:
     type: object
     properties:
@@ -2016,7 +2167,122 @@ definitions:
     properties:
       '@type':
         type: string
+        description: |-
+          A URL/resource name that uniquely identifies the type of the serialized
+          protocol buffer message. This string must contain at least
+          one "/" character. The last segment of the URL's path must represent
+          the fully qualified name of the type (as in
+          `path/google.protobuf.Duration`). The name should be in a canonical form
+          (e.g., leading "." is not accepted).
+
+          In practice, teams usually precompile into the binary all types that they
+          expect it to use in the context of Any. However, for URLs which use the
+          scheme `http`, `https`, or no scheme, one can optionally set up a type
+          server that maps type URLs to message definitions as follows:
+
+          * If no scheme is provided, `https` is assumed.
+          * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+            value in binary format, or produce an error.
+          * Applications are allowed to cache lookup results based on the
+            URL, or have them precompiled into a binary to avoid any
+            lookup. Therefore, binary compatibility needs to be preserved
+            on changes to types. (Use versioned type names to manage
+            breaking changes.)
+
+          Note: this functionality is not currently available in the official
+          protobuf release, and it is not used for type URLs beginning with
+          type.googleapis.com. As of May 2023, there are no widely used type server
+          implementations and no plans to implement one.
+
+          Schemes other than `http`, `https` (or the empty scheme) might be
+          used with implementation specific semantics.
     additionalProperties: {}
+    description: |-
+      `Any` contains an arbitrary serialized protocol buffer message along with a
+      URL that describes the type of the serialized message.
+
+      Protobuf library provides support to pack/unpack Any values in the form
+      of utility functions or additional generated methods of the Any type.
+
+      Example 1: Pack and unpack a message in C++.
+
+          Foo foo = ...;
+          Any any;
+          any.PackFrom(foo);
+          ...
+          if (any.UnpackTo(&foo)) {
+            ...
+          }
+
+      Example 2: Pack and unpack a message in Java.
+
+          Foo foo = ...;
+          Any any = Any.pack(foo);
+          ...
+          if (any.is(Foo.class)) {
+            foo = any.unpack(Foo.class);
+          }
+          // or ...
+          if (any.isSameTypeAs(Foo.getDefaultInstance())) {
+            foo = any.unpack(Foo.getDefaultInstance());
+          }
+
+       Example 3: Pack and unpack a message in Python.
+
+          foo = Foo(...)
+          any = Any()
+          any.Pack(foo)
+          ...
+          if any.Is(Foo.DESCRIPTOR):
+            any.Unpack(foo)
+            ...
+
+       Example 4: Pack and unpack a message in Go
+
+           foo := &pb.Foo{...}
+           any, err := anypb.New(foo)
+           if err != nil {
+             ...
+           }
+           ...
+           foo := &pb.Foo{}
+           if err := any.UnmarshalTo(foo); err != nil {
+             ...
+           }
+
+      The pack methods provided by protobuf library will by default use
+      'type.googleapis.com/full.type.name' as the type URL and the unpack
+      methods only use the fully qualified type name after the last '/'
+      in the type URL, for example "foo.bar.com/x/y.z" will yield type
+      name "y.z".
+
+      JSON
+      ====
+      The JSON representation of an `Any` value uses the regular
+      representation of the deserialized, embedded message, with an
+      additional field `@type` which contains the type URL. Example:
+
+          package google.profile;
+          message Person {
+            string first_name = 1;
+            string last_name = 2;
+          }
+
+          {
+            "@type": "type.googleapis.com/google.profile.Person",
+            "firstName": <string>,
+            "lastName": <string>
+          }
+
+      If the embedded message type is well-known and has a custom JSON
+      representation, that representation will be embedded adding a field
+      `value` which holds the custom JSON in addition to the `@type`
+      field. Example (for message [google.protobuf.Duration][]):
+
+          {
+            "@type": "type.googleapis.com/google.protobuf.Duration",
+            "value": "1.212s"
+          }
   v1Activity:
     type: object
     properties:
@@ -2049,14 +2315,6 @@ definitions:
         type: string
       isRawText:
         type: boolean
-  v1BatchUpsertTagRequest:
-    type: object
-    properties:
-      requests:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/v1UpsertTagRequest'
   v1BlockquoteNode:
     type: object
     properties:
@@ -2132,13 +2390,6 @@ definitions:
       content:
         type: string
         format: byte
-  v1GetTagSuggestionsResponse:
-    type: object
-    properties:
-      tags:
-        type: array
-        items:
-          type: string
   v1GetUserMemosStatsResponse:
     type: object
     properties:
@@ -2213,8 +2464,8 @@ definitions:
     type: string
     enum:
       - TYPE_UNSPECIFIED
-      - TYPE_MEMO_COMMENT
-      - TYPE_VERSION_UPDATE
+      - MEMO_COMMENT
+      - VERSION_UPDATE
     default: TYPE_UNSPECIFIED
   v1ItalicNode:
     type: object
@@ -2265,6 +2516,14 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/v1Memo'
+  v1ListMemoPropertiesResponse:
+    type: object
+    properties:
+      properties:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/v1MemoProperty'
   v1ListMemoReactionsResponse:
     type: object
     properties:
@@ -2289,6 +2548,18 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/v1Resource'
+  v1ListMemoTagsResponse:
+    type: object
+    properties:
+      tagAmounts:
+        type: object
+        additionalProperties:
+          type: integer
+          format: int32
+        description: |-
+          tag_amounts is the amount of tags.
+          key is the tag name. e.g. "tag1".
+          value is the amount of the tag.
   v1ListMemosResponse:
     type: object
     properties:
@@ -2310,14 +2581,6 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/v1Resource'
-  v1ListTagsResponse:
-    type: object
-    properties:
-      tags:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/v1Tag'
   v1ListUserAccessTokensResponse:
     type: object
     properties:
@@ -2342,14 +2605,6 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/v1Webhook'
-  v1ListWorkspaceSettingsResponse:
-    type: object
-    properties:
-      settings:
-        type: array
-        items:
-          type: object
-          $ref: '#/definitions/apiv1WorkspaceSetting'
   v1MathBlockNode:
     type: object
     properties:
@@ -2398,6 +2653,10 @@ definitions:
         readOnly: true
       visibility:
         $ref: '#/definitions/v1Visibility'
+      tags:
+        type: array
+        items:
+          type: string
       pinned:
         type: boolean
       parentId:
@@ -2422,6 +2681,30 @@ definitions:
           type: object
           $ref: '#/definitions/v1Reaction'
         readOnly: true
+      property:
+        $ref: '#/definitions/v1MemoProperty'
+        readOnly: true
+      parent:
+        type: string
+        title: |-
+          The name of the parent memo.
+          Format: memos/{id}
+        readOnly: true
+  v1MemoProperty:
+    type: object
+    properties:
+      tags:
+        type: array
+        items:
+          type: string
+      hasLink:
+        type: boolean
+      hasTaskList:
+        type: boolean
+      hasCode:
+        type: boolean
+      hasIncompleteTasks:
+        type: boolean
   v1MemoRelation:
     type: object
     properties:
@@ -2614,18 +2897,6 @@ definitions:
         type: string
       params:
         type: string
-  v1RenameTagRequest:
-    type: object
-    properties:
-      user:
-        type: string
-        title: |-
-          The creator of tags.
-          Format: users/{id}
-      oldName:
-        type: string
-      newName:
-        type: string
   v1Resource:
     type: object
     properties:
@@ -2739,16 +3010,6 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/TableNodeRow'
-  v1Tag:
-    type: object
-    properties:
-      name:
-        type: string
-      creator:
-        type: string
-        title: |-
-          The creator of tags.
-          Format: users/{id}
   v1TagNode:
     type: object
     properties:
@@ -2787,11 +3048,6 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/v1Node'
-  v1UpsertTagRequest:
-    type: object
-    properties:
-      name:
-        type: string
   v1User:
     type: object
     properties:
@@ -2856,10 +3112,10 @@ definitions:
       creatorId:
         type: integer
         format: int32
-      createdTime:
+      createTime:
         type: string
         format: date-time
-      updatedTime:
+      updateTime:
         type: string
         format: date-time
       rowStatus:
@@ -2882,3 +3138,6 @@ definitions:
       mode:
         type: string
         description: mode is the instance mode (e.g. "prod", "dev" or "demo").
+      public:
+        type: boolean
+        description: public is a flag that the instance is open for other users.

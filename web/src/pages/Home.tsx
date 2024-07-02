@@ -1,12 +1,11 @@
 import { Button } from "@mui/joy";
 import clsx from "clsx";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import useLocalStorage from "react-use/lib/useLocalStorage";
 import Empty from "@/components/Empty";
 import { HomeSidebar, HomeSidebarDrawer } from "@/components/HomeSidebar";
 import Icon from "@/components/Icon";
 import MemoEditor from "@/components/MemoEditor";
-import showMemoEditorDialog from "@/components/MemoEditor/MemoEditorDialog";
-import MemoFilter from "@/components/MemoFilter";
 import MemoView from "@/components/MemoView";
 import MobileHeader from "@/components/MobileHeader";
 import { DEFAULT_LIST_MEMOS_PAGE_SIZE } from "@/helpers/consts";
@@ -14,6 +13,7 @@ import { getTimeStampByDate } from "@/helpers/datetime";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useFilterWithUrlParams from "@/hooks/useFilterWithUrlParams";
 import useResponsiveWidth from "@/hooks/useResponsiveWidth";
+import { Routes } from "@/router";
 import { useMemoList, useMemoStore } from "@/store/v1";
 import { RowStatus } from "@/types/proto/api/v1/common";
 import { useTranslate } from "@/utils/i18n";
@@ -24,49 +24,56 @@ const Home = () => {
   const user = useCurrentUser();
   const memoStore = useMemoStore();
   const memoList = useMemoList();
+  const [, setLastVisited] = useLocalStorage<string>("lastVisited", Routes.HOME);
   const [isRequesting, setIsRequesting] = useState(true);
-  const nextPageTokenRef = useRef<string | undefined>(undefined);
-  const { tag: tagQuery, text: textQuery } = useFilterWithUrlParams();
+  const [nextPageToken, setNextPageToken] = useState<string>("");
+  const filter = useFilterWithUrlParams();
   const sortedMemos = memoList.value
     .filter((memo) => memo.rowStatus === RowStatus.ACTIVE)
     .sort((a, b) => getTimeStampByDate(b.displayTime) - getTimeStampByDate(a.displayTime))
     .sort((a, b) => Number(b.pinned) - Number(a.pinned));
 
   useEffect(() => {
-    nextPageTokenRef.current = undefined;
-    memoList.reset();
-    fetchMemos();
-  }, [tagQuery, textQuery]);
+    setLastVisited(Routes.HOME);
+  }, []);
 
-  const fetchMemos = async () => {
+  useEffect(() => {
+    memoList.reset();
+    fetchMemos("");
+  }, [filter.tag, filter.text, filter.memoPropertyFilter]);
+
+  const fetchMemos = async (nextPageToken: string) => {
+    setIsRequesting(true);
     const filters = [`creator == "${user.name}"`, `row_status == "NORMAL"`, `order_by_pinned == true`];
     const contentSearch: string[] = [];
-    if (tagQuery) {
-      contentSearch.push(JSON.stringify(`#${tagQuery}`));
-    }
-    if (textQuery) {
-      contentSearch.push(JSON.stringify(textQuery));
+    if (filter.text) {
+      contentSearch.push(JSON.stringify(filter.text));
     }
     if (contentSearch.length > 0) {
       filters.push(`content_search == [${contentSearch.join(", ")}]`);
     }
-    setIsRequesting(true);
-    const data = await memoStore.fetchMemos({
+    if (filter.tag) {
+      filters.push(`tag == "${filter.tag}"`);
+    }
+    if (filter.memoPropertyFilter) {
+      if (filter.memoPropertyFilter.hasLink) {
+        filters.push(`has_link == true`);
+      }
+      if (filter.memoPropertyFilter.hasTaskList) {
+        filters.push(`has_task_list == true`);
+      }
+      if (filter.memoPropertyFilter.hasCode) {
+        filters.push(`has_code == true`);
+      }
+    }
+    const response = await memoStore.fetchMemos({
       pageSize: DEFAULT_LIST_MEMOS_PAGE_SIZE,
       filter: filters.join(" && "),
-      pageToken: nextPageTokenRef.current,
+      pageToken: nextPageToken,
     });
     setIsRequesting(false);
-    nextPageTokenRef.current = data.nextPageToken;
+    setNextPageToken(response.nextPageToken);
   };
-
-  const handleEditPrevious = useCallback(() => {
-    const lastMemo = memoList.value[memoList.value.length - 1];
-    showMemoEditorDialog({
-      memoName: lastMemo.name,
-      cacheKey: `${lastMemo.name}-${lastMemo.displayTime}`,
-    });
-  }, [memoList]);
 
   return (
     <section className="@container w-full max-w-5xl min-h-full flex flex-col justify-start items-center sm:pt-3 md:pt-6 pb-8">
@@ -77,18 +84,17 @@ const Home = () => {
       )}
       <div className={clsx("w-full flex flex-row justify-start items-start px-4 sm:px-6 gap-4")}>
         <div className={clsx(md ? "w-[calc(100%-15rem)]" : "w-full")}>
-          <MemoEditor className="mb-2" cacheKey="home-memo-editor" onEditPrevious={handleEditPrevious} />
+          <MemoEditor className="mb-2" cacheKey="home-memo-editor" />
           <div className="flex flex-col justify-start items-start w-full max-w-full">
-            <MemoFilter className="px-2 pb-2" />
             {sortedMemos.map((memo) => (
-              <MemoView key={`${memo.name}-${memo.updateTime}`} memo={memo} showVisibility showPinned />
+              <MemoView key={`${memo.name}-${memo.updateTime}`} memo={memo} showVisibility showPinned compact />
             ))}
             {isRequesting ? (
               <div className="flex flex-row justify-center items-center w-full my-4 text-gray-400">
                 <Icon.Loader className="w-4 h-auto animate-spin mr-1" />
                 <p className="text-sm italic">{t("memo.fetching-data")}</p>
               </div>
-            ) : !nextPageTokenRef.current ? (
+            ) : !nextPageToken ? (
               sortedMemos.length === 0 && (
                 <div className="w-full mt-12 mb-8 flex flex-col justify-center items-center italic">
                   <Empty />
@@ -97,7 +103,7 @@ const Home = () => {
               )
             ) : (
               <div className="w-full flex flex-row justify-center items-center my-4">
-                <Button variant="plain" endDecorator={<Icon.ArrowDown className="w-5 h-auto" />} onClick={fetchMemos}>
+                <Button variant="plain" endDecorator={<Icon.ArrowDown className="w-5 h-auto" />} onClick={() => fetchMemos(nextPageToken)}>
                   {t("memo.fetch-more")}
                 </Button>
               </div>
