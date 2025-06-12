@@ -135,7 +135,7 @@ const AddMemoRelationPopover = (props: Props) => {
         </Button>
       </PopoverTrigger>
       <PopoverContent align="center">
-        <div className="w-[16rem] flex flex-col justify-start items-start">
+        <div className="w-[16rem] p-1 flex flex-col justify-start items-start">
           <Autocomplete
             className="w-full"
             size="md"
@@ -148,7 +148,7 @@ const AddMemoRelationPopover = (props: Props) => {
             inputValue={searchText}
             value={selectedMemos}
             multiple
-            onInputChange={(_, value) => setSearchText(value.trim())}
+            onInputChange={(_, value) => setSearchText(value.trimStart())}
             getOptionKey={(memo) => memo.name}
             getOptionLabel={(memo) => memo.content}
             isOptionEqualToValue={(memo, value) => memo.name === value.name}
@@ -162,7 +162,7 @@ const AddMemoRelationPopover = (props: Props) => {
             )}
             renderTags={(memos) =>
               memos.map((memo) => (
-                <Chip key={memo.name} className="!max-w-full !rounded" variant="outlined" color="neutral">
+                <Chip key={memo.name} className="max-w-full! rounded!" variant="outlined" color="neutral">
                   <div className="w-full flex flex-col justify-start items-start">
                     <p className="text-xs text-gray-400 select-none">{memo.displayTime?.toLocaleString()}</p>
                     <span className="w-full text-sm leading-5 truncate">{memo.content}</span>
