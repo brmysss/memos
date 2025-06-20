@@ -29,7 +29,7 @@ const (
 	unmatchedUsernameAndPasswordError = "unmatched username and password"
 )
 
-func (s *APIV1Service) GetAuthStatus(ctx context.Context, _ *v1pb.GetAuthStatusRequest) (*v1pb.User, error) {
+func (s *APIV1Service) GetCurrentSession(ctx context.Context, _ *v1pb.GetCurrentSessionRequest) (*v1pb.User, error) {
 	user, err := s.GetCurrentUser(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "failed to get current user: %v", err)
@@ -44,7 +44,7 @@ func (s *APIV1Service) GetAuthStatus(ctx context.Context, _ *v1pb.GetAuthStatusR
 	return convertUserFromStore(user), nil
 }
 
-func (s *APIV1Service) SignIn(ctx context.Context, request *v1pb.SignInRequest) (*v1pb.User, error) {
+func (s *APIV1Service) CreateSession(ctx context.Context, request *v1pb.CreateSessionRequest) (*v1pb.User, error) {
 	var existingUser *store.User
 	if passwordCredentials := request.GetPasswordCredentials(); passwordCredentials != nil {
 		user, err := s.Store.GetUser(ctx, &store.FindUser{
@@ -237,15 +237,14 @@ func (s *APIV1Service) SignUp(ctx context.Context, request *v1pb.SignUpRequest) 
 	return convertUserFromStore(user), nil
 }
 
-func (s *APIV1Service) SignOut(ctx context.Context, _ *v1pb.SignOutRequest) (*emptypb.Empty, error) {
+func (s *APIV1Service) DeleteSession(ctx context.Context, _ *v1pb.DeleteSessionRequest) (*emptypb.Empty, error) {
 	accessToken, ok := ctx.Value(accessTokenContextKey).(string)
 	// Try to delete the access token from the store.
 	if ok {
 		user, _ := s.GetCurrentUser(ctx)
 		if user != nil {
 			if _, err := s.DeleteUserAccessToken(ctx, &v1pb.DeleteUserAccessTokenRequest{
-				Name:        fmt.Sprintf("%s%d", UserNamePrefix, user.ID),
-				AccessToken: accessToken,
+				Name: fmt.Sprintf("%s%d/accessTokens/%s", UserNamePrefix, user.ID, accessToken),
 			}); err != nil {
 				slog.Error("failed to delete access token", "error", err)
 			}

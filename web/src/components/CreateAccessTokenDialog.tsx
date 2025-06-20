@@ -70,9 +70,11 @@ const CreateAccessTokenDialog: React.FC<Props> = (props: Props) => {
 
     try {
       await userServiceClient.createUserAccessToken({
-        name: currentUser.name,
-        description: state.description,
-        expiresAt: state.expiration ? new Date(Date.now() + state.expiration * 1000) : undefined,
+        parent: currentUser.name,
+        accessToken: {
+          description: state.description,
+          expiresAt: state.expiration ? new Date(Date.now() + state.expiration * 1000) : undefined,
+        },
       });
 
       onConfirm();
@@ -91,7 +93,7 @@ const CreateAccessTokenDialog: React.FC<Props> = (props: Props) => {
           <XIcon className="w-5 h-auto" />
         </Button>
       </div>
-      <div className="flex flex-col justify-start items-start !w-80">
+      <div className="flex flex-col justify-start items-start w-80!">
         <div className="w-full flex flex-col justify-start items-start mb-3">
           <span className="mb-2">
             {t("setting.access-token-section.create-dialog.description")} <span className="text-red-600">*</span>

@@ -11,14 +11,14 @@ import { User } from "./user_service";
 
 export const protobufPackage = "memos.api.v1";
 
-export interface GetAuthStatusRequest {
+export interface GetCurrentSessionRequest {
 }
 
-export interface GetAuthStatusResponse {
+export interface GetCurrentSessionResponse {
   user?: User | undefined;
 }
 
-export interface SignInRequest {
+export interface CreateSessionRequest {
   /** Username and password authentication method. */
   passwordCredentials?:
     | PasswordCredentials
@@ -27,49 +27,73 @@ export interface SignInRequest {
   ssoCredentials?:
     | SSOCredentials
     | undefined;
-  /** Whether the session should never expire. */
+  /**
+   * Whether the session should never expire.
+   * Optional field that defaults to false for security.
+   */
   neverExpire: boolean;
 }
 
 export interface PasswordCredentials {
-  /** The username to sign in with. */
+  /**
+   * The username to sign in with.
+   * Required field for password-based authentication.
+   */
   username: string;
-  /** The password to sign in with. */
+  /**
+   * The password to sign in with.
+   * Required field for password-based authentication.
+   */
   password: string;
 }
 
 export interface SSOCredentials {
-  /** The ID of the SSO provider. */
+  /**
+   * The ID of the SSO provider.
+   * Required field to identify the SSO provider.
+   */
   idpId: number;
-  /** The code to sign in with. */
+  /**
+   * The authorization code from the SSO provider.
+   * Required field for completing the SSO flow.
+   */
   code: string;
-  /** The redirect URI. */
+  /**
+   * The redirect URI used in the SSO flow.
+   * Required field for security validation.
+   */
   redirectUri: string;
 }
 
+export interface DeleteSessionRequest {
+}
+
 export interface SignUpRequest {
-  /** The username to sign up with. */
+  /**
+   * The username to sign up with.
+   * Required field that must be unique across the system.
+   */
   username: string;
-  /** The password to sign up with. */
+  /**
+   * The password to sign up with.
+   * Required field that should meet security requirements.
+   */
   password: string;
 }
 
-export interface SignOutRequest {
-}
-
-function createBaseGetAuthStatusRequest(): GetAuthStatusRequest {
+function createBaseGetCurrentSessionRequest(): GetCurrentSessionRequest {
   return {};
 }
 
-export const GetAuthStatusRequest: MessageFns<GetAuthStatusRequest> = {
-  encode(_: GetAuthStatusRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const GetCurrentSessionRequest: MessageFns<GetCurrentSessionRequest> = {
+  encode(_: GetCurrentSessionRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetAuthStatusRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): GetCurrentSessionRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetAuthStatusRequest();
+    const message = createBaseGetCurrentSessionRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -82,31 +106,31 @@ export const GetAuthStatusRequest: MessageFns<GetAuthStatusRequest> = {
     return message;
   },
 
-  create(base?: DeepPartial<GetAuthStatusRequest>): GetAuthStatusRequest {
-    return GetAuthStatusRequest.fromPartial(base ?? {});
+  create(base?: DeepPartial<GetCurrentSessionRequest>): GetCurrentSessionRequest {
+    return GetCurrentSessionRequest.fromPartial(base ?? {});
   },
-  fromPartial(_: DeepPartial<GetAuthStatusRequest>): GetAuthStatusRequest {
-    const message = createBaseGetAuthStatusRequest();
+  fromPartial(_: DeepPartial<GetCurrentSessionRequest>): GetCurrentSessionRequest {
+    const message = createBaseGetCurrentSessionRequest();
     return message;
   },
 };
 
-function createBaseGetAuthStatusResponse(): GetAuthStatusResponse {
+function createBaseGetCurrentSessionResponse(): GetCurrentSessionResponse {
   return { user: undefined };
 }
 
-export const GetAuthStatusResponse: MessageFns<GetAuthStatusResponse> = {
-  encode(message: GetAuthStatusResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const GetCurrentSessionResponse: MessageFns<GetCurrentSessionResponse> = {
+  encode(message: GetCurrentSessionResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.user !== undefined) {
       User.encode(message.user, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetAuthStatusResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): GetCurrentSessionResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetAuthStatusResponse();
+    const message = createBaseGetCurrentSessionResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -127,22 +151,22 @@ export const GetAuthStatusResponse: MessageFns<GetAuthStatusResponse> = {
     return message;
   },
 
-  create(base?: DeepPartial<GetAuthStatusResponse>): GetAuthStatusResponse {
-    return GetAuthStatusResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<GetCurrentSessionResponse>): GetCurrentSessionResponse {
+    return GetCurrentSessionResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<GetAuthStatusResponse>): GetAuthStatusResponse {
-    const message = createBaseGetAuthStatusResponse();
+  fromPartial(object: DeepPartial<GetCurrentSessionResponse>): GetCurrentSessionResponse {
+    const message = createBaseGetCurrentSessionResponse();
     message.user = (object.user !== undefined && object.user !== null) ? User.fromPartial(object.user) : undefined;
     return message;
   },
 };
 
-function createBaseSignInRequest(): SignInRequest {
+function createBaseCreateSessionRequest(): CreateSessionRequest {
   return { passwordCredentials: undefined, ssoCredentials: undefined, neverExpire: false };
 }
 
-export const SignInRequest: MessageFns<SignInRequest> = {
-  encode(message: SignInRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const CreateSessionRequest: MessageFns<CreateSessionRequest> = {
+  encode(message: CreateSessionRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.passwordCredentials !== undefined) {
       PasswordCredentials.encode(message.passwordCredentials, writer.uint32(10).fork()).join();
     }
@@ -155,10 +179,10 @@ export const SignInRequest: MessageFns<SignInRequest> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): SignInRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateSessionRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSignInRequest();
+    const message = createBaseCreateSessionRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -195,11 +219,11 @@ export const SignInRequest: MessageFns<SignInRequest> = {
     return message;
   },
 
-  create(base?: DeepPartial<SignInRequest>): SignInRequest {
-    return SignInRequest.fromPartial(base ?? {});
+  create(base?: DeepPartial<CreateSessionRequest>): CreateSessionRequest {
+    return CreateSessionRequest.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<SignInRequest>): SignInRequest {
-    const message = createBaseSignInRequest();
+  fromPartial(object: DeepPartial<CreateSessionRequest>): CreateSessionRequest {
+    const message = createBaseCreateSessionRequest();
     message.passwordCredentials = (object.passwordCredentials !== undefined && object.passwordCredentials !== null)
       ? PasswordCredentials.fromPartial(object.passwordCredentials)
       : undefined;
@@ -339,6 +363,40 @@ export const SSOCredentials: MessageFns<SSOCredentials> = {
   },
 };
 
+function createBaseDeleteSessionRequest(): DeleteSessionRequest {
+  return {};
+}
+
+export const DeleteSessionRequest: MessageFns<DeleteSessionRequest> = {
+  encode(_: DeleteSessionRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteSessionRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteSessionRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  create(base?: DeepPartial<DeleteSessionRequest>): DeleteSessionRequest {
+    return DeleteSessionRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<DeleteSessionRequest>): DeleteSessionRequest {
+    const message = createBaseDeleteSessionRequest();
+    return message;
+  },
+};
+
 function createBaseSignUpRequest(): SignUpRequest {
   return { username: "", password: "" };
 }
@@ -397,49 +455,18 @@ export const SignUpRequest: MessageFns<SignUpRequest> = {
   },
 };
 
-function createBaseSignOutRequest(): SignOutRequest {
-  return {};
-}
-
-export const SignOutRequest: MessageFns<SignOutRequest> = {
-  encode(_: SignOutRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): SignOutRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSignOutRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  create(base?: DeepPartial<SignOutRequest>): SignOutRequest {
-    return SignOutRequest.fromPartial(base ?? {});
-  },
-  fromPartial(_: DeepPartial<SignOutRequest>): SignOutRequest {
-    const message = createBaseSignOutRequest();
-    return message;
-  },
-};
-
 export type AuthServiceDefinition = typeof AuthServiceDefinition;
 export const AuthServiceDefinition = {
   name: "AuthService",
   fullName: "memos.api.v1.AuthService",
   methods: {
-    /** GetAuthStatus returns the current auth status of the user. */
-    getAuthStatus: {
-      name: "GetAuthStatus",
-      requestType: GetAuthStatusRequest,
+    /**
+     * GetCurrentSession returns the current active session information.
+     * This method is idempotent and safe, suitable for checking current session state.
+     */
+    getCurrentSession: {
+      name: "GetCurrentSession",
+      requestType: GetCurrentSessionRequest,
       requestStream: false,
       responseType: User,
       responseStream: false,
@@ -447,9 +474,9 @@ export const AuthServiceDefinition = {
         _unknownFields: {
           578365826: [
             new Uint8Array([
-              21,
-              34,
-              19,
+              31,
+              18,
+              29,
               47,
               97,
               112,
@@ -464,20 +491,33 @@ export const AuthServiceDefinition = {
               104,
               47,
               115,
-              116,
-              97,
-              116,
-              117,
+              101,
               115,
+              115,
+              105,
+              111,
+              110,
+              115,
+              47,
+              99,
+              117,
+              114,
+              114,
+              101,
+              110,
+              116,
             ]),
           ],
         },
       },
     },
-    /** SignIn signs in the user. */
-    signIn: {
-      name: "SignIn",
-      requestType: SignInRequest,
+    /**
+     * CreateSession authenticates a user and creates a new session.
+     * Returns the authenticated user information upon successful authentication.
+     */
+    createSession: {
+      name: "CreateSession",
+      requestType: CreateSessionRequest,
       requestStream: false,
       responseType: User,
       responseStream: false,
@@ -485,9 +525,12 @@ export const AuthServiceDefinition = {
         _unknownFields: {
           578365826: [
             new Uint8Array([
-              21,
+              26,
+              58,
+              1,
+              42,
               34,
-              19,
+              21,
               47,
               97,
               112,
@@ -502,17 +545,73 @@ export const AuthServiceDefinition = {
               104,
               47,
               115,
+              101,
+              115,
+              115,
               105,
-              103,
+              111,
               110,
-              105,
-              110,
+              115,
             ]),
           ],
         },
       },
     },
-    /** SignUp signs up the user with the given username and password. */
+    /**
+     * DeleteSession terminates the current user session.
+     * This is an idempotent operation that invalidates the user's authentication.
+     */
+    deleteSession: {
+      name: "DeleteSession",
+      requestType: DeleteSessionRequest,
+      requestStream: false,
+      responseType: Empty,
+      responseStream: false,
+      options: {
+        _unknownFields: {
+          578365826: [
+            new Uint8Array([
+              31,
+              42,
+              29,
+              47,
+              97,
+              112,
+              105,
+              47,
+              118,
+              49,
+              47,
+              97,
+              117,
+              116,
+              104,
+              47,
+              115,
+              101,
+              115,
+              115,
+              105,
+              111,
+              110,
+              115,
+              47,
+              99,
+              117,
+              114,
+              114,
+              101,
+              110,
+              116,
+            ]),
+          ],
+        },
+      },
+    },
+    /**
+     * SignUp creates a new user account with username and password.
+     * Returns the newly created user information upon successful registration.
+     */
     signUp: {
       name: "SignUp",
       requestType: SignUpRequest,
@@ -523,7 +622,10 @@ export const AuthServiceDefinition = {
         _unknownFields: {
           578365826: [
             new Uint8Array([
-              21,
+              24,
+              58,
+              1,
+              42,
               34,
               19,
               47,
@@ -545,45 +647,6 @@ export const AuthServiceDefinition = {
               110,
               117,
               112,
-            ]),
-          ],
-        },
-      },
-    },
-    /** SignOut signs out the user. */
-    signOut: {
-      name: "SignOut",
-      requestType: SignOutRequest,
-      requestStream: false,
-      responseType: Empty,
-      responseStream: false,
-      options: {
-        _unknownFields: {
-          578365826: [
-            new Uint8Array([
-              22,
-              34,
-              20,
-              47,
-              97,
-              112,
-              105,
-              47,
-              118,
-              49,
-              47,
-              97,
-              117,
-              116,
-              104,
-              47,
-              115,
-              105,
-              103,
-              110,
-              111,
-              117,
-              116,
             ]),
           ],
         },

@@ -12,7 +12,7 @@ import UserAvatar from "@/components/UserAvatar";
 import useLoading from "@/hooks/useLoading";
 import { viewStore, userStore } from "@/store/v2";
 import memoFilterStore from "@/store/v2/memoFilter";
-import { Direction, State } from "@/types/proto/api/v1/common";
+import { State } from "@/types/proto/api/v1/common";
 import { Memo } from "@/types/proto/api/v1/memo_service";
 import { User } from "@/types/proto/api/v1/user_service";
 import { useTranslate } from "@/utils/i18n";
@@ -87,10 +87,10 @@ const UserProfile = observer(() => {
                 </Button>
               </div>
               <div className="w-full flex flex-col justify-start items-start pt-4 pb-8 px-3">
-                <UserAvatar className="!w-16 !h-16 drop-shadow rounded-3xl" avatarUrl={user?.avatarUrl} />
+                <UserAvatar className="w-16! h-16! drop-shadow rounded-3xl" avatarUrl={user?.avatarUrl} />
                 <div className="mt-2 w-auto max-w-[calc(100%-6rem)] flex flex-col justify-center items-start">
                   <p className="w-full text-3xl text-black leading-tight font-medium opacity-80 dark:text-gray-200 truncate">
-                    {user.nickname || user.username}
+                    {user.displayName || user.username}
                   </p>
                   <p className="w-full text-gray-500 leading-snug dark:text-gray-400 whitespace-pre-wrap truncate line-clamp-6">
                     {user.description}
@@ -112,7 +112,7 @@ const UserProfile = observer(() => {
                     .sort((a, b) => Number(b.pinned) - Number(a.pinned))
                 }
                 owner={user.name}
-                direction={viewStore.state.orderByTimeAsc ? Direction.ASC : Direction.DESC}
+                orderBy={viewStore.state.orderByTimeAsc ? "display_time asc" : "display_time desc"}
                 oldFilter={memoListFilter}
               />
             </>

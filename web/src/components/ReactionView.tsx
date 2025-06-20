@@ -19,12 +19,12 @@ const stringifyUsers = (users: User[], reactionType: string): string => {
     return "";
   }
   if (users.length < 5) {
-    return users.map((user) => user.nickname || user.username).join(", ") + " reacted with " + reactionType.toLowerCase();
+    return users.map((user) => user.displayName || user.username).join(", ") + " reacted with " + reactionType.toLowerCase();
   }
   return (
     `${users
       .slice(0, 4)
-      .map((user) => user.nickname || user.username)
+      .map((user) => user.displayName || user.username)
       .join(", ")} and ${users.length - 4} more reacted with ` + reactionType.toLowerCase()
   );
 };
@@ -55,7 +55,7 @@ const ReactionView = observer((props: Props) => {
           (reaction) => reaction.reactionType === reactionType && reaction.creator === currentUser.name,
         );
         for (const reaction of reactions) {
-          await memoServiceClient.deleteMemoReaction({ id: reaction.id });
+          await memoServiceClient.deleteMemoReaction({ name: reaction.name });
         }
       }
     } catch {
@@ -68,7 +68,7 @@ const ReactionView = observer((props: Props) => {
     <Tooltip title={stringifyUsers(users, reactionType)} placement="top">
       <div
         className={cn(
-          "h-7 border px-2 py-0.5 rounded-full flex flex-row justify-center items-center gap-1 dark:border-zinc-700",
+          "h-7 border border-zinc-200 px-2 py-0.5 rounded-full flex flex-row justify-center items-center gap-1 dark:border-zinc-700",
           "text-sm text-gray-600 dark:text-gray-400",
           currentUser && !readonly && "cursor-pointer",
           hasReaction && "bg-blue-100 border-blue-200 dark:bg-zinc-900",

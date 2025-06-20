@@ -14,12 +14,12 @@ import { useTranslate } from "@/utils/i18n";
 import { convertVisibilityToString } from "@/utils/memo";
 import { isSuperUser } from "@/utils/user";
 import MemoActionMenu from "./MemoActionMenu";
+import MemoAttachmentListView from "./MemoAttachmentListView";
 import MemoContent from "./MemoContent";
 import MemoEditor from "./MemoEditor";
 import MemoLocationView from "./MemoLocationView";
 import MemoReactionistView from "./MemoReactionListView";
 import MemoRelationListView from "./MemoRelationListView";
-import MemoResourceListView from "./MemoResourceListView";
 import showPreviewImageDialog from "./PreviewImageDialog";
 import ReactionSelector from "./ReactionSelector";
 import UserAvatar from "./UserAvatar";
@@ -148,7 +148,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
                   to={`/u/${encodeURIComponent(creator.username)}`}
                   viewTransition
                 >
-                  {creator.nickname || creator.username}
+                  {creator.displayName || creator.username}
                 </Link>
                 <div
                   className="w-auto -mt-0.5 text-xs leading-tight text-gray-400 dark:text-gray-500 select-none cursor-pointer"
@@ -226,7 +226,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
           parentPage={parentPage}
         />
         {memo.location && <MemoLocationView location={memo.location} />}
-        <MemoResourceListView resources={memo.resources} />
+        <MemoAttachmentListView attachments={memo.attachments} />
         <MemoRelationListView memo={memo} relations={referencedMemos} parentPage={parentPage} />
         <MemoReactionistView memo={memo} reactions={memo.reactions} />
       </div>

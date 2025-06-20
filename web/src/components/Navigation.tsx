@@ -48,10 +48,10 @@ const Navigation = observer((props: Props) => {
     title: t("common.explore"),
     icon: <EarthIcon className="w-6 h-auto opacity-70 shrink-0" />,
   };
-  const resourcesNavLink: NavLinkItem = {
-    id: "header-resources",
-    path: Routes.RESOURCES,
-    title: t("common.resources"),
+  const attachmentsNavLink: NavLinkItem = {
+    id: "header-attachments",
+    path: Routes.ATTACHMENTS,
+    title: t("common.attachments"),
     icon: <PaperclipIcon className="w-6 h-auto opacity-70 shrink-0" />,
   };
   const signInNavLink: NavLinkItem = {
@@ -61,7 +61,7 @@ const Navigation = observer((props: Props) => {
     icon: <UserCircleIcon className="w-6 h-auto opacity-70 shrink-0" />,
   };
 
-  const navLinks: NavLinkItem[] = currentUser ? [homeNavLink, exploreNavLink, resourcesNavLink] : [exploreNavLink, signInNavLink];
+  const navLinks: NavLinkItem[] = currentUser ? [homeNavLink, exploreNavLink, attachmentsNavLink] : [exploreNavLink, signInNavLink];
 
   return (
     <header
@@ -78,9 +78,9 @@ const Navigation = observer((props: Props) => {
           <NavLink
             className={({ isActive }) =>
               cn(
-                "px-2 py-2 rounded-2xl border flex flex-row items-center text-lg text-gray-800 dark:text-gray-400 hover:bg-white hover:border-gray-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-800",
+                "px-2 py-2 rounded-2xl border flex flex-row items-center text-lg text-gray-800 dark:text-gray-400 hover:bg-white hover:border-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-800",
                 collapsed ? "" : "w-full px-4",
-                isActive ? "bg-white drop-shadow-sm dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" : "border-transparent",
+                isActive ? "bg-white drop-shadow-sm dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700" : "border-transparent",
               )
             }
             key={navLink.id}

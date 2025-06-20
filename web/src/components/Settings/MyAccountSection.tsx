@@ -1,4 +1,3 @@
-import { Dropdown, Menu, MenuButton, MenuItem } from "@mui/joy";
 import { Button } from "@usememos/mui";
 import { MoreVerticalIcon, PenLineIcon } from "lucide-react";
 import useCurrentUser from "@/hooks/useCurrentUser";
@@ -6,6 +5,7 @@ import { useTranslate } from "@/utils/i18n";
 import showChangeMemberPasswordDialog from "../ChangeMemberPasswordDialog";
 import showUpdateAccountDialog from "../UpdateAccountDialog";
 import UserAvatar from "../UserAvatar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import AccessTokenSection from "./AccessTokenSection";
 
 const MyAccountSection = () => {
@@ -19,7 +19,7 @@ const MyAccountSection = () => {
         <UserAvatar className="mr-2 shrink-0 w-10 h-10" avatarUrl={user.avatarUrl} />
         <div className="max-w-[calc(100%-3rem)] flex flex-col justify-center items-start">
           <p className="w-full">
-            <span className="text-xl leading-tight font-medium">{user.nickname}</span>
+            <span className="text-xl leading-tight font-medium">{user.displayName}</span>
             <span className="ml-1 text-base leading-tight text-gray-500 dark:text-gray-400">({user.username})</span>
           </p>
           <p className="w-4/5 leading-tight text-sm truncate">{user.description}</p>
@@ -30,16 +30,21 @@ const MyAccountSection = () => {
           <PenLineIcon className="w-4 h-4 mx-auto mr-1" />
           {t("common.edit")}
         </Button>
-        <Dropdown>
-          <MenuButton slots={{ root: "div" }}>
+        <Popover>
+          <PopoverTrigger asChild>
             <Button variant="outlined">
               <MoreVerticalIcon className="w-4 h-4 mx-auto" />
             </Button>
-          </MenuButton>
-          <Menu className="text-sm" size="sm" placement="bottom">
-            <MenuItem onClick={() => showChangeMemberPasswordDialog(user)}>{t("setting.account-section.change-password")}</MenuItem>
-          </Menu>
-        </Dropdown>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="text-sm p-1">
+            <button
+              onClick={() => showChangeMemberPasswordDialog(user)}
+              className="w-full flex items-center gap-2 px-2 py-1 text-left text-sm hover:bg-gray-100 rounded-md"
+            >
+              {t("setting.account-section.change-password")}
+            </button>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <AccessTokenSection />

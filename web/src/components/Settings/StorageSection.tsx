@@ -13,7 +13,7 @@ import {
   WorkspaceStorageSetting,
   WorkspaceStorageSetting_S3Config,
   WorkspaceStorageSetting_StorageType,
-} from "@/types/proto/api/v1/workspace_setting_service";
+} from "@/types/proto/api/v1/workspace_service";
 import { useTranslate } from "@/utils/i18n";
 
 const StorageSection = observer(() => {
@@ -198,7 +198,7 @@ const StorageSection = observer(() => {
           {t("common.save")}
         </Button>
       </div>
-      <Divider className="!my-2" />
+      <Divider className="my-2!" />
       <div className="w-full mt-4">
         <p className="text-sm">{t("common.learn-more")}:</p>
         <List component="ul" marker="disc" size="sm">
