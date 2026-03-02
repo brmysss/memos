@@ -1,13 +1,11 @@
 import defaultDarkThemeContent from "../themes/default-dark.css?raw";
-import midnightThemeContent from "../themes/midnight.css?raw";
 import paperThemeContent from "../themes/paper.css?raw";
-import whitewallThemeContent from "../themes/whitewall.css?raw";
 
 // ============================================================================
 // Types and Constants
 // ============================================================================
 
-const VALID_THEMES = ["system", "default", "default-dark", "midnight", "paper", "whitewall"] as const;
+const VALID_THEMES = ["system", "default", "default-dark", "paper"] as const;
 
 export type Theme = (typeof VALID_THEMES)[number];
 export type ResolvedTheme = Exclude<Theme, "system">;
@@ -23,18 +21,14 @@ const STYLE_ELEMENT_ID = "instance-theme";
 const THEME_CONTENT: Record<ResolvedTheme, string | null> = {
   default: null,
   "default-dark": defaultDarkThemeContent,
-  midnight: midnightThemeContent,
   paper: paperThemeContent,
-  whitewall: whitewallThemeContent,
 };
 
 export const THEME_OPTIONS: ThemeOption[] = [
   { value: "system", label: "Sync with system" },
   { value: "default", label: "Light" },
   { value: "default-dark", label: "Dark" },
-  { value: "midnight", label: "Midnight" },
   { value: "paper", label: "Paper" },
-  { value: "whitewall", label: "Whitewall" },
 ];
 
 // ============================================================================
